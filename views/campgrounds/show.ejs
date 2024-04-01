@@ -44,7 +44,7 @@
                         Looks Good!
                     </div>
                 </div>
-                <button class="btn btn-success">Add</button>
+                <button class="btn btn-success">Add Review</button>
             </form>
             <% for(let review of campground.reviews) { %>
                 <div class="card mb-3">
@@ -53,6 +53,11 @@
                         </h5>
                         <p class="card-text">Review : <%=review.body%>
                         </p>
+                        <form
+                            action="/campgrounds/<%=campground._id%>/review/<%=campground.reviews._id%>?_method=Delete"
+                            method="post">
+                            <button class="btn btn-sm btn-danger">Delete</button>
+                        </form>
                     </div>
                 </div>
                 <% } %>
