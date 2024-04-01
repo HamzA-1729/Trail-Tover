@@ -1,7 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import ejsMate from "ejs-mate";
-import { campgroundSchema } from "./schemas.js";
+import { campgroundSchema, reviewSchema } from "./schemas.js";
 import catchAsync from "./utils/catchAsync.js";
 import ExpressError from "./utils/ExpressError.js";
 import methodOverride from "method-override";
@@ -40,6 +40,15 @@ const validateCampground = (req, res, next) => {
     }
 }
 
+const validateReview = (req, res, next) => {
+    const { error } = reviewSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',');
+        throw new ExpressError(msg, 400)
+    } else {
+        next();
+    }
+}
 
 app.get('/', (req, res) => {
     res.render('home')
@@ -83,7 +92,7 @@ app.delete('/campgrounds/:id', catchAsync(async (req, res) => {
     res.redirect('/campgrounds');
 }));
 
-app.post("/campgrounds/:id/review", catchAsync(async (req, res) => {
+app.post("/campgrounds/:id/review", validateReview, catchAsync(async (req, res) => {
     const { id } = req.params;
     const campground = await Campground.findById(id);
     const review = new Review(req.body.review);
