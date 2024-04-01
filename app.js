@@ -88,6 +88,12 @@ app.put('/campgrounds/:id', validateCampground, catchAsync(async (req, res) => {
 
 app.delete('/campgrounds/:id', catchAsync(async (req, res) => {
     const { id } = req.params;
+    const campground = await Campground.findById(id);
+    await Review.deleteMany({
+        _id: {
+            $in: campground.reviews
+        }
+    });
     await Campground.findByIdAndDelete(id);
     res.redirect('/campgrounds');
 }));
