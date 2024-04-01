@@ -6,6 +6,7 @@ import catchAsync from "./utils/catchAsync.js";
 import ExpressError from "./utils/ExpressError.js";
 import methodOverride from "method-override";
 import Campground from "./models/campground.js";
+import Review from "./models/review.js";
 
 mongoose.connect('mongodb://localhost:27017/yelp-camp')
     .then(() => {
@@ -80,6 +81,16 @@ app.delete('/campgrounds/:id', catchAsync(async (req, res) => {
     const { id } = req.params;
     await Campground.findByIdAndDelete(id);
     res.redirect('/campgrounds');
+}));
+
+app.post("/campgrounds/:id/review", catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const campground = await Campground.findById(id);
+    const review = new Review(req.body.review);
+    campground.reviews.push(review);
+    await review.save();
+    await campground.save();
+    res.redirect(`/campgrounds/${campground._id}`);
 }));
 
 app.all('*', (req, res, next) => {
