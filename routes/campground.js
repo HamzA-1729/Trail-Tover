@@ -3,6 +3,7 @@ import Campground from "../models/campground.js";
 import { campgroundSchema } from "../schemas.js";
 import catchAsync from "../utils/catchAsync.js";
 import ExpressError from "../utils/ExpressError.js";
+import Review from "../models/review.js";
 const router = express.Router();
 
 const validateCampground = (req, res, next) => {
