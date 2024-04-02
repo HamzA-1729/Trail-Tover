@@ -28,6 +28,8 @@ app.set('view engine', 'ejs');
 
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
+app.use(express.static("public"));
+
 app.use("/campgrounds", campground);
 app.use("/campgrounds/:id/review", review);
 
