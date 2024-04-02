@@ -2,6 +2,8 @@ import express from "express";
 import mongoose from "mongoose";
 import ejsMate from "ejs-mate";
 import methodOverride from "method-override";
+import session from "express-session";
+import flash from "connect-flash";
 import campground from "./routes/campground.js";
 import review from "./routes/review.js";
 import ExpressError from "./utils/ExpressError.js";
@@ -29,6 +31,23 @@ app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(express.static("public"));
+const sessionConfig = {
+    secret: 'thisismysecret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+        httpOnly: true
+    }
+};
+app.use(session(sessionConfig));
+app.use(flash());
+
+app.use((req, res, next) => {
+    res.locals.success = req.flash("success");
+    res.locals.error = req.flash("error");
+    next();
+});
 
 app.use("/campgrounds", campground);
 app.use("/campgrounds/:id/review", review);
