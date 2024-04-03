@@ -1,6 +1,7 @@
 import express from "express";
 import { reviewSchema } from "../schemas.js";
 import Review from "../models/review.js";
+import Campground from "../models/campground.js";
 import catchAsync from "../utils/catchAsync.js";
 import ExpressError from "../utils/ExpressError.js";
 const router = express.Router({ mergeParams: true });
@@ -22,6 +23,7 @@ router.post("/", validateReview, catchAsync(async (req, res) => {
     campground.reviews.push(review);
     await review.save();
     await campground.save();
+    req.flash("success", "Review Added Successfully!");
     res.redirect(`/campgrounds/${campground._id}`);
 }));
 
@@ -29,6 +31,7 @@ router.delete("/:reviewId", catchAsync(async (req, res) => {
     const { id, reviewId } = req.params;
     await Review.findByIdAndDelete(reviewId);
     await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
+    req.flash("success", "Review Deleted Successfully!");
     res.redirect(`/campgrounds/${id}`);
 }));
 
