@@ -4,9 +4,13 @@ import ejsMate from "ejs-mate";
 import methodOverride from "method-override";
 import session from "express-session";
 import flash from "connect-flash";
-import campground from "./routes/campground.js";
-import review from "./routes/review.js";
+import passport from "passport";
+import LocalStrategy from "passport-local";
+import campgroundRoutes from "./routes/campground.js";
+import reviewRoutes from "./routes/review.js";
 import ExpressError from "./utils/ExpressError.js";
+import User from "./models/user.js";
+import userRoutes from "./routes/user.js";
 
 
 mongoose.connect('mongodb://localhost:27017/yelp-camp')
@@ -42,6 +46,12 @@ const sessionConfig = {
 };
 app.use(session(sessionConfig));
 app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
     res.locals.success = req.flash("success");
@@ -49,8 +59,9 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use("/campgrounds", campground);
-app.use("/campgrounds/:id/review", review);
+app.use("/", userRoutes);
+app.use("/campgrounds", campgroundRoutes);
+app.use("/campgrounds/:id/review", reviewRoutes);
 
 
 app.get('/', (req, res) => {
