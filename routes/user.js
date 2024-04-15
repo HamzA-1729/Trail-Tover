@@ -12,6 +12,17 @@ router.get("/login", (req, res) => {
     res.render("user/login");
 });
 
+router.get("/logout", (req, res) => {
+    req.logOut(err => {
+        if (err)
+            req.flash("error", err);
+        else {
+            req.flash("success", "Successfully LoggedOut");
+            res.redirect("/campgrounds");
+        }
+    });
+});
+
 router.post("/register", catchAsync(async (req, res) => {
     try {
         const { username, email, password } = req.body;
