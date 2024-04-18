@@ -12,24 +12,25 @@ router.get("/login", (req, res) => {
     res.render("user/login");
 });
 
-router.get("/logout", (req, res) => {
+router.get("/logout", (req, res, next) => {
     req.logOut(err => {
         if (err)
-            req.flash("error", err);
-        else {
-            req.flash("success", "Successfully LoggedOut");
-            res.redirect("/campgrounds");
-        }
+            return next(err);
+        req.flash("success", "Successfully LoggedOut");
+        res.redirect("/campgrounds");
     });
 });
 
-router.post("/register", catchAsync(async (req, res) => {
+router.post("/register", catchAsync(async (req, res, next) => {
     try {
         const { username, email, password } = req.body;
         const newUser = new User({ username, email });
-        await User.register(newUser, password);
-        req.flash("success", "Register successfully");
-        res.redirect("/campgrounds");
+        const registerUser = await User.register(newUser, password);
+        req.logIn(registerUser, err => {
+            if (err) return next(err);
+            req.flash("success", "Register successfully");
+            res.redirect("/campgrounds");
+        });
     } catch (e) {
         req.flash("error", e.message);
         res.redirect("/register");
