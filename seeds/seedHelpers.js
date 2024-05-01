@@ -1,4 +1,4 @@
-descriptors = [
+const descriptors = [
     'Forest',
     'Ancient',
     'Petrified',
@@ -17,9 +17,9 @@ descriptors = [
     'Sky',
     'Dusty',
     'Diamond'
-]
+];
 
-places = [
+const places = [
     'Flats',
     'Village',
     'Canyon',
@@ -41,6 +41,6 @@ places = [
     'Hunting Camp',
     'Cliffs',
     'Hollow'
-]
+];
 
 export { places, descriptors };
