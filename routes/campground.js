@@ -1,21 +1,10 @@
 import express from "express";
 import Campground from "../models/campground.js";
-import { campgroundSchema } from "../schemas.js";
 import catchAsync from "../utils/catchAsync.js";
-import ExpressError from "../utils/ExpressError.js";
 import Review from "../models/review.js";
-import isLoggedIn from "../middleware.js";
+import { isLoggedIn, validateCampground, isAuthor } from "../middleware.js";
 const router = express.Router();
 
-const validateCampground = (req, res, next) => {
-    const { error } = campgroundSchema.validate(req.body);
-    if (error) {
-        const msg = error.details.map(el => el.message).join(',');
-        throw new ExpressError(msg, 400)
-    } else {
-        next();
-    }
-}
 
 router.get('/', catchAsync(async (req, res) => {
     const campgrounds = await Campground.find({});
@@ -54,23 +43,24 @@ router.get('/:id', isLoggedIn, catchAsync(async (req, res) => {
 }));
 
 
-router.get('/:id/edit', isLoggedIn, catchAsync(async (req, res) => {
-    const campground = await Campground.findById(req.params.id)
+router.get('/:id/edit', isLoggedIn, isAuthor, catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const campground = await Campground.findById(id);
     if (!campground) {
         req.flash("error", "OOps Campground not Created!");
-        res.redirect("/campgrounds");
+        return res.redirect("/campgrounds");
     }
     res.render('campgrounds/edit', { campground });
 }))
 
-router.put('/:id', isLoggedIn, validateCampground, catchAsync(async (req, res) => {
+router.put('/:id', isLoggedIn, isAuthor, validateCampground, catchAsync(async (req, res) => {
     const { id } = req.params;
     const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
     req.flash("success", "Campground Updated Successfully!");
-    res.redirect(`/campgrounds/${campground._id}`)
+    res.redirect(`/campgrounds/${id}`);
 }));
 
-router.delete('/:id', isLoggedIn, catchAsync(async (req, res) => {
+router.delete('/:id', isLoggedIn, isAuthor, catchAsync(async (req, res) => {
     const { id } = req.params;
     const campground = await Campground.findById(id);
     await Review.deleteMany({
