@@ -2,6 +2,7 @@ import { campgroundSchema } from "./schemas.js";
 import Campground from "./models/campground.js";
 import ExpressError from "./utils/ExpressError.js";
 import { reviewSchema } from "./schemas.js";
+import Review from "./models/review.js";
 const isLoggedIn = (req, res, next) => {
     if (!req.isAuthenticated()) {
         req.flash("error", "You must be Logged In");
@@ -39,4 +40,14 @@ const validateReview = (req, res, next) => {
         next();
     }
 }
-export { isLoggedIn, validateCampground, isAuthor, validateReview };
+
+const isReviewAuthor = async (req, res, next) => {
+    const { id, reviewId } = req.params;
+    const review = await Review.findById(reviewId);
+    if (!review.author.equals(req.user._id)) {
+        req.flash("error", "OOps u dont have the permission to delete!");
+        return res.redirect(`/campgrounds/${id}`);
+    }
+    next();
+}
+export { isLoggedIn, validateCampground, isAuthor, validateReview, isReviewAuthor };
