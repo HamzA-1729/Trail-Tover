@@ -8,8 +8,8 @@ router.route("/register")
     .post(userController.registerUser);
 
 router.route("/login")
-    .get("/login", userController.renderLoginForm)
-    .post("/login", passport.authenticate("local", { failureFlash: true, failureRedirect: "/login" }), userController.loginUser);
+    .get(userController.renderLoginForm)
+    .post(passport.authenticate("local", { failureFlash: true, failureRedirect: "/login" }), userController.loginUser);
 
 router.get("/logout", userController.logoutUser);
 

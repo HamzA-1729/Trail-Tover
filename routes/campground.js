@@ -1,6 +1,7 @@
 import express from "express";
 import { isLoggedIn, validateCampground, isAuthor } from "../middleware.js";
 import campgroundController from "../controllers/campground.js";
+
 const router = express.Router();
 
 router.route("/")

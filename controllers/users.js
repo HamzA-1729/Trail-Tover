@@ -5,17 +5,19 @@ const userController = {
     renderRegisterForm: (req, res) => {
         res.render("user/register");
     },
+
     renderLoginForm: (req, res) => {
         res.render("user/login");
     },
+
     logoutUser: (req, res, next) => {
         req.logOut(err => {
-            if (err)
-                return next(err);
+            if (err) return next(err);
             req.flash("success", "Successfully LoggedOut");
             res.redirect("/campgrounds");
         });
     },
+
     registerUser: catchAsync(async (req, res, next) => {
         try {
             const { username, email, password } = req.body;
@@ -26,17 +28,16 @@ const userController = {
                 req.flash("success", "Register successfully");
                 res.redirect("/campgrounds");
             });
-        } catch (e) {
-            req.flash("error", e.message);
+        } catch (error) {
+            req.flash("error", error.message);
             res.redirect("/register");
         }
-
     }),
+
     loginUser: (req, res) => {
         req.flash("success", "Logged in successfully");
         res.redirect("/campgrounds");
     }
-
 };
 
 export default userController;
